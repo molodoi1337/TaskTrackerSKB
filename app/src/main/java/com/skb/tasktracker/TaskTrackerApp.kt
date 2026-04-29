@@ -1,0 +1,50 @@
+package com.skb.tasktracker
+
+import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.skb.tasktracker.data.db.AppDatabase
+import com.skb.tasktracker.data.repository.ProjectRepository
+import com.skb.tasktracker.data.repository.TaskRepository
+import com.skb.tasktracker.notifications.DeadlineWorker
+import java.util.concurrent.TimeUnit
+
+class TaskTrackerApp : Application() {
+    val database by lazy { AppDatabase.get(this) }
+    val taskRepository by lazy { TaskRepository(database.taskDao()) }
+    val projectRepository by lazy { ProjectRepository(database.projectDao()) }
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+        scheduleDeadlineWorker()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Дедлайны задач",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply { description = "Уведомления о приближающихся дедлайнах задач" }
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        }
+    }
+
+    private fun scheduleDeadlineWorker() {
+        val request = PeriodicWorkRequestBuilder<DeadlineWorker>(1, TimeUnit.HOURS).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            DeadlineWorker.WORK_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
+    }
+
+    companion object {
+        const val CHANNEL_ID = "task_deadline"
+    }
+}
