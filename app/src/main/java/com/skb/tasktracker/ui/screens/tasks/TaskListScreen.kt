@@ -1,5 +1,10 @@
 package com.skb.tasktracker.ui.screens.tasks
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +24,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
@@ -29,6 +37,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -45,9 +54,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skb.tasktracker.TaskTrackerApp
 import com.skb.tasktracker.data.entity.Task
 import com.skb.tasktracker.data.entity.TaskStatus
 import com.skb.tasktracker.ui.components.StatusChip
@@ -58,21 +69,32 @@ import com.skb.tasktracker.util.formatDate
 @Composable
 fun TaskListScreen(
     onAddTask: () -> Unit,
+    onAddProject: () -> Unit,
     onOpenTask: (Long) -> Unit,
-    onOpenProjects: () -> Unit
+    onOpenProjects: () -> Unit,
+    onOpenAssignees: () -> Unit
 ) {
-    val vm = appViewModel { app -> TaskListViewModel(app.taskRepository, app.projectRepository) }
+    val ctx = LocalContext.current
+    val app = ctx.applicationContext as TaskTrackerApp
+    val vm = appViewModel {
+        TaskListViewModel(app.taskRepository, app.projectRepository, app.assigneeRepository, app)
+    }
     val tasks by vm.tasks.collectAsStateWithLifecycle()
     val filters by vm.filters.collectAsStateWithLifecycle()
     val projects by vm.projects.collectAsStateWithLifecycle()
+    val assignees by vm.assignees.collectAsStateWithLifecycle()
     var sortMenu by remember { mutableStateOf(false) }
     var projectMenu by remember { mutableStateOf(false) }
+    var fabExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Task Tracker SKB", fontWeight = FontWeight.SemiBold) },
                 actions = {
+                    IconButton(onClick = onOpenAssignees) {
+                        Icon(Icons.Default.Group, contentDescription = "Исполнители")
+                    }
                     IconButton(onClick = onOpenProjects) {
                         Icon(Icons.Default.Folder, contentDescription = "Проекты")
                     }
@@ -93,8 +115,33 @@ fun TaskListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddTask) {
-                Icon(Icons.Default.Add, contentDescription = "Добавить")
+            Column(horizontalAlignment = Alignment.End) {
+                AnimatedVisibility(
+                    visible = fabExpanded,
+                    enter = fadeIn() + slideInVertically { it },
+                    exit = fadeOut() + slideOutVertically { it }
+                ) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        ExtendedFloatingActionButton(
+                            text = { Text("Проект") },
+                            icon = { Icon(Icons.Default.Folder, null) },
+                            onClick = { fabExpanded = false; onAddProject() }
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        ExtendedFloatingActionButton(
+                            text = { Text("Задача") },
+                            icon = { Icon(Icons.Default.Assignment, null) },
+                            onClick = { fabExpanded = false; onAddTask() }
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+                }
+                FloatingActionButton(onClick = { fabExpanded = !fabExpanded }) {
+                    Icon(
+                        if (fabExpanded) Icons.Default.Close else Icons.Default.Add,
+                        contentDescription = if (fabExpanded) "Закрыть" else "Добавить"
+                    )
+                }
             }
         }
     ) { padding ->
@@ -161,6 +208,7 @@ fun TaskListScreen(
                         TaskCard(
                             task = task,
                             projectName = projects.firstOrNull { it.id == task.projectId }?.name,
+                            assigneeName = assignees.firstOrNull { it.id == task.assigneeId }?.name,
                             onClick = { onOpenTask(task.id) }
                         )
                     }
@@ -171,7 +219,7 @@ fun TaskListScreen(
 }
 
 @Composable
-private fun TaskCard(task: Task, projectName: String?, onClick: () -> Unit) {
+private fun TaskCard(task: Task, projectName: String?, assigneeName: String?, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
@@ -197,7 +245,7 @@ private fun TaskCard(task: Task, projectName: String?, onClick: () -> Unit) {
                 )
             }
             Spacer(Modifier.height(10.dp))
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 projectName?.let {
                     Box(
                         modifier = Modifier
@@ -208,10 +256,10 @@ private fun TaskCard(task: Task, projectName: String?, onClick: () -> Unit) {
                     }
                     Spacer(Modifier.width(8.dp))
                 }
-                if (task.assignee.isNotBlank()) {
+                assigneeName?.let {
                     Icon(Icons.Default.Person, null, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(2.dp))
-                    Text(task.assignee, style = MaterialTheme.typography.labelSmall)
+                    Text(it, style = MaterialTheme.typography.labelSmall)
                     Spacer(Modifier.width(8.dp))
                 }
                 Spacer(Modifier.weight(1f))

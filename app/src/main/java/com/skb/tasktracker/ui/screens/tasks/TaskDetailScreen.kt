@@ -32,13 +32,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skb.tasktracker.TaskTrackerApp
+import com.skb.tasktracker.data.entity.ReminderFrequency
 import com.skb.tasktracker.data.entity.TaskStatus
 import com.skb.tasktracker.ui.components.StatusChip
 import com.skb.tasktracker.ui.components.appViewModel
 import com.skb.tasktracker.util.formatDate
+import com.skb.tasktracker.util.formatDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -47,11 +51,14 @@ fun TaskDetailScreen(
     onBack: () -> Unit,
     onEdit: () -> Unit
 ) {
-    val vm = appViewModel(key = "detail-$taskId") { app ->
-        TaskDetailViewModel(app.taskRepository, app.projectRepository, taskId)
+    val ctx = LocalContext.current
+    val app = ctx.applicationContext as TaskTrackerApp
+    val vm = appViewModel(key = "detail-$taskId") {
+        TaskDetailViewModel(app.taskRepository, app.projectRepository, app.assigneeRepository, app, taskId)
     }
     val task by vm.task.collectAsStateWithLifecycle()
     val project by vm.project.collectAsStateWithLifecycle()
+    val assignee by vm.assignee.collectAsStateWithLifecycle()
     var confirmDelete by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -87,9 +94,15 @@ fun TaskDetailScreen(
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     DetailRow("Описание", t.description.ifBlank { "—" })
                     DetailRow("Проект", project?.name ?: "—")
-                    DetailRow("Исполнитель", t.assignee.ifBlank { "—" })
+                    DetailRow("Исполнитель", assignee?.name ?: "—")
                     DetailRow("Дедлайн", t.deadline.formatDate())
                     DetailRow("Создана", t.createdAt.formatDate())
+                    if (t.reminderFrequency != ReminderFrequency.NONE) {
+                        DetailRow("Напоминание", t.reminderAt.formatDateTime())
+                        DetailRow("Частота", t.reminderFrequency.title)
+                    } else {
+                        DetailRow("Напоминание", "—")
+                    }
                 }
             }
             Spacer(Modifier.height(4.dp))

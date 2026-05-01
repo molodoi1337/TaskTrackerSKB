@@ -1,12 +1,16 @@
 package com.skb.tasktracker.ui.screens.tasks
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skb.tasktracker.data.entity.Assignee
 import com.skb.tasktracker.data.entity.Project
 import com.skb.tasktracker.data.entity.Task
 import com.skb.tasktracker.data.entity.TaskStatus
+import com.skb.tasktracker.data.repository.AssigneeRepository
 import com.skb.tasktracker.data.repository.ProjectRepository
 import com.skb.tasktracker.data.repository.TaskRepository
+import com.skb.tasktracker.notifications.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,13 +35,19 @@ data class TaskListUiState(
 
 class TaskListViewModel(
     private val taskRepo: TaskRepository,
-    private val projectRepo: ProjectRepository
+    projectRepo: ProjectRepository,
+    assigneeRepo: AssigneeRepository,
+    private val appContext: Context
 ) : ViewModel() {
 
     private val _filters = MutableStateFlow(TaskListUiState())
     val filters: StateFlow<TaskListUiState> = _filters.asStateFlow()
 
     val projects: StateFlow<List<Project>> = projectRepo.projects.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+    )
+
+    val assignees: StateFlow<List<Assignee>> = assigneeRepo.assignees.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
     )
 
@@ -67,6 +77,9 @@ class TaskListViewModel(
     }
 
     fun delete(task: Task) {
-        viewModelScope.launch { taskRepo.delete(task.id) }
+        viewModelScope.launch {
+            ReminderScheduler.cancel(appContext, task.id)
+            taskRepo.delete(task.id)
+        }
     }
 }

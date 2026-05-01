@@ -17,6 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.skb.tasktracker.ui.navigation.Screen
+import com.skb.tasktracker.ui.screens.assignees.AssigneeEditScreen
+import com.skb.tasktracker.ui.screens.assignees.AssigneeListScreen
 import com.skb.tasktracker.ui.screens.projects.ProjectEditScreen
 import com.skb.tasktracker.ui.screens.projects.ProjectListScreen
 import com.skb.tasktracker.ui.screens.tasks.TaskDetailScreen
@@ -41,8 +43,10 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.TaskList.route) {
                             TaskListScreen(
                                 onAddTask = { navController.navigate(Screen.TaskEdit.build()) },
+                                onAddProject = { navController.navigate(Screen.ProjectEdit.build()) },
                                 onOpenTask = { navController.navigate(Screen.TaskDetail.build(it)) },
-                                onOpenProjects = { navController.navigate(Screen.Projects.route) }
+                                onOpenProjects = { navController.navigate(Screen.Projects.route) },
+                                onOpenAssignees = { navController.navigate(Screen.Assignees.route) }
                             )
                         }
                         composable(Screen.Projects.route) {
@@ -52,6 +56,13 @@ class MainActivity : ComponentActivity() {
                                 onEdit = { navController.navigate(Screen.ProjectEdit.build(it)) }
                             )
                         }
+                        composable(Screen.Assignees.route) {
+                            AssigneeListScreen(
+                                onBack = { navController.popBackStack() },
+                                onAdd = { navController.navigate(Screen.AssigneeEdit.build()) },
+                                onEdit = { navController.navigate(Screen.AssigneeEdit.build(it)) }
+                            )
+                        }
                         composable(
                             route = Screen.TaskEdit.route,
                             arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L })
@@ -59,7 +70,8 @@ class MainActivity : ComponentActivity() {
                             val id = entry.arguments?.getLong("id") ?: -1L
                             TaskEditScreen(
                                 taskId = id.takeIf { it > 0 },
-                                onBack = { navController.popBackStack() }
+                                onBack = { navController.popBackStack() },
+                                onAddAssignee = { navController.navigate(Screen.AssigneeEdit.build()) }
                             )
                         }
                         composable(
@@ -80,6 +92,16 @@ class MainActivity : ComponentActivity() {
                             val id = entry.arguments?.getLong("id") ?: -1L
                             ProjectEditScreen(
                                 projectId = id.takeIf { it > 0 },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable(
+                            route = Screen.AssigneeEdit.route,
+                            arguments = listOf(navArgument("id") { type = NavType.LongType; defaultValue = -1L })
+                        ) { entry ->
+                            val id = entry.arguments?.getLong("id") ?: -1L
+                            AssigneeEditScreen(
+                                assigneeId = id.takeIf { it > 0 },
                                 onBack = { navController.popBackStack() }
                             )
                         }

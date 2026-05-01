@@ -15,6 +15,18 @@ enum class TaskStatus(val title: String) {
     }
 }
 
+enum class ReminderFrequency(val title: String) {
+    NONE("Без напоминания"),
+    ONCE("Однократно"),
+    DAILY("Ежедневно"),
+    WEEKLY("Еженедельно"),
+    MONTHLY("Ежемесячно");
+
+    companion object {
+        fun fromName(name: String?): ReminderFrequency = entries.firstOrNull { it.name == name } ?: NONE
+    }
+}
+
 @Entity(
     tableName = "tasks",
     foreignKeys = [
@@ -23,18 +35,26 @@ enum class TaskStatus(val title: String) {
             parentColumns = ["id"],
             childColumns = ["projectId"],
             onDelete = ForeignKey.SET_NULL
+        ),
+        ForeignKey(
+            entity = Assignee::class,
+            parentColumns = ["id"],
+            childColumns = ["assigneeId"],
+            onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index("projectId")]
+    indices = [Index("projectId"), Index("assigneeId")]
 )
 data class Task(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
     val description: String = "",
     val projectId: Long? = null,
-    val assignee: String = "",
+    val assigneeId: Long? = null,
     val deadline: Long? = null,
     val status: TaskStatus = TaskStatus.NEW,
     val createdAt: Long = System.currentTimeMillis(),
-    val deadlineNotified: Boolean = false
+    val deadlineNotified: Boolean = false,
+    val reminderAt: Long? = null,
+    val reminderFrequency: ReminderFrequency = ReminderFrequency.NONE
 )
