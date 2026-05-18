@@ -1,0 +1,131 @@
+@startuml UseCase_TaskTrackerSKB
+title Диаграмма прецедентов — Task Tracker SKB
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #EAF4FF
+  BorderColor #2A6FBF
+  ArrowColor #2A6FBF
+}
+skinparam actor {
+  BackgroundColor #FFF7E0
+  BorderColor #B07A00
+}
+left to right direction
+
+actor "Сотрудник СКБ" as User
+actor "Система уведомлений\n(WorkManager)" as Notifier
+
+rectangle "Task Tracker SKB" {
+
+  ' ===== ЗАДАЧИ =====
+  package "Управление задачами" {
+    usecase "Просмотр списка задач" as UC_TaskList
+    usecase "Просмотр деталей задачи" as UC_TaskDetail
+    usecase "Создать задачу" as UC_TaskCreate
+    usecase "Редактировать задачу" as UC_TaskEdit
+    usecase "Изменить статус задачи" as UC_TaskStatus
+    usecase "Удалить задачу" as UC_TaskDelete
+
+    usecase "Поиск по задачам" as UC_TaskSearch
+    usecase "Фильтровать по статусу" as UC_FilterStatus
+    usecase "Фильтровать по проекту" as UC_FilterProject
+    usecase "Сортировать задачи" as UC_Sort
+    usecase "Установить дедлайн" as UC_SetDeadline
+    usecase "Настроить напоминание" as UC_SetReminder
+  }
+
+  ' ===== ПРОЕКТЫ =====
+  package "Управление проектами" {
+    usecase "Просмотр проектов" as UC_ProjList
+    usecase "Создать проект" as UC_ProjCreate
+    usecase "Редактировать проект" as UC_ProjEdit
+    usecase "Удалить проект" as UC_ProjDelete
+    usecase "Быстрое создание проекта (FAB)" as UC_ProjQuick
+  }
+
+  ' ===== ИСПОЛНИТЕЛИ =====
+  package "Справочник исполнителей" {
+    usecase "Просмотр исполнителей" as UC_AsgList
+    usecase "Добавить исполнителя" as UC_AsgCreate
+    usecase "Редактировать исполнителя" as UC_AsgEdit
+    usecase "Удалить исполнителя" as UC_AsgDelete
+  }
+
+  ' ===== ОБЩИЕ / СЛУЖЕБНЫЕ =====
+  usecase "Выбрать проект из списка" as UC_PickProject
+  usecase "Выбрать исполнителя из списка" as UC_PickAssignee
+  usecase "Подтвердить удаление" as UC_Confirm
+  usecase "Сохранить в БД (Room)" as UC_Persist
+
+  ' ===== УВЕДОМЛЕНИЯ =====
+  package "Уведомления" {
+    usecase "Получить уведомление\nо приближении дедлайна" as UC_NotifyDeadline
+    usecase "Получить пользовательское\nнапоминание" as UC_NotifyReminder
+    usecase "Перепланировать\nповторное напоминание" as UC_Reschedule
+  }
+}
+
+' ===== Связи актёров с прецедентами =====
+User --> UC_TaskList
+User --> UC_TaskDetail
+User --> UC_TaskCreate
+User --> UC_TaskEdit
+User --> UC_TaskStatus
+User --> UC_TaskDelete
+User --> UC_ProjList
+User --> UC_ProjCreate
+User --> UC_ProjEdit
+User --> UC_ProjDelete
+User --> UC_ProjQuick
+User --> UC_AsgList
+User --> UC_AsgCreate
+User --> UC_AsgEdit
+User --> UC_AsgDelete
+
+Notifier --> UC_NotifyDeadline
+Notifier --> UC_NotifyReminder
+
+' ===== <<include>> — обязательные части сценария =====
+UC_TaskCreate ..> UC_PickProject   : <<include>>
+UC_TaskCreate ..> UC_PickAssignee  : <<include>>
+UC_TaskCreate ..> UC_Persist       : <<include>>
+
+UC_TaskEdit   ..> UC_PickProject   : <<include>>
+UC_TaskEdit   ..> UC_PickAssignee  : <<include>>
+UC_TaskEdit   ..> UC_Persist       : <<include>>
+
+UC_TaskStatus ..> UC_Persist       : <<include>>
+
+UC_TaskDelete ..> UC_Confirm       : <<include>>
+UC_ProjDelete ..> UC_Confirm       : <<include>>
+UC_AsgDelete  ..> UC_Confirm       : <<include>>
+
+UC_ProjCreate ..> UC_Persist       : <<include>>
+UC_ProjEdit   ..> UC_Persist       : <<include>>
+UC_AsgCreate  ..> UC_Persist       : <<include>>
+UC_AsgEdit    ..> UC_Persist       : <<include>>
+
+UC_TaskDetail ..> UC_TaskList      : <<include>>
+UC_NotifyReminder ..> UC_Reschedule : <<include>>
+
+' ===== <<extend>> — необязательные расширения базового сценария =====
+UC_TaskSearch    ..> UC_TaskList    : <<extend>>
+UC_FilterStatus  ..> UC_TaskList    : <<extend>>
+UC_FilterProject ..> UC_TaskList    : <<extend>>
+UC_Sort          ..> UC_TaskList    : <<extend>>
+
+UC_SetDeadline   ..> UC_TaskCreate  : <<extend>>
+UC_SetReminder   ..> UC_TaskCreate  : <<extend>>
+UC_SetDeadline   ..> UC_TaskEdit    : <<extend>>
+UC_SetReminder   ..> UC_TaskEdit    : <<extend>>
+
+UC_ProjQuick     ..> UC_ProjCreate  : <<extend>>
+
+' Уведомление о дедлайне порождается наличием дедлайна
+UC_NotifyDeadline ..> UC_SetDeadline : <<extend>>
+UC_NotifyReminder ..> UC_SetReminder : <<extend>>
+
+@enduml
