@@ -1,0 +1,51 @@
+@startuml Flowchart_DeadlineWorker
+title Блок-схема алгоритма DeadlineWorker.doWork()\n(периодическая проверка дедлайнов)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF4FF
+skinparam ActivityBorderColor #2A6FBF
+skinparam ActivityDiamondBackgroundColor #FFF3D6
+skinparam ActivityDiamondBorderColor #B07A00
+skinparam ArrowColor #333333
+skinparam defaultFontName Sans
+
+start
+
+:Запуск воркера\n(WorkManager, период 6 ч);
+:now := текущее время\nuntil := now + 24 ч;
+:due ← TaskRepository.upcomingDue(until)\n(задачи со статусом ≠ "Выполнена",\nдедлайн ≤ until, ещё не уведомлены);
+
+if (due пустой?) then (да)
+  :return Result.success();
+  stop
+else (нет)
+endif
+
+if (есть разрешение\nPOST_NOTIFICATIONS?) then (нет)
+  :return Result.success();
+  stop
+else (да)
+endif
+
+:i := 0;
+while (i < size(due)?) is (да)
+  :task := due[i];
+  :построить PendingIntent\n→ MainActivity;
+  :собрать NotificationCompat\n("Дедлайн скоро: <title>");
+
+  if (task.deadline − now ≤ 1 ч?) then (да)
+    :priority := HIGH;
+  else (нет)
+    :priority := DEFAULT;
+  endif
+
+  :NotificationManager.notify(task.id);
+  :TaskRepository.markNotified(task.id);
+  :i := i + 1;
+endwhile (нет)
+
+:return Result.success();
+stop
+
+@enduml
