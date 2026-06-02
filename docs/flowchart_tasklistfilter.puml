@@ -12,35 +12,20 @@ skinparam defaultFontName Sans
 
 start
 
-:Получить (all, f):\nall — все задачи,\nf — фильтры/сортировка;
-:result := all;
+:Вход: all — все задачи,\nf — фильтры/сортировка;
+:result := [], i := 0;
 
-if (f.query не пуст?) then (да)
-  :q := lowercase(trim(f.query));
-  :result := отфильтровать по\ntitle.contains(q) OR\ndescription.contains(q);
-else (нет)
-endif
+while (i < size(all)?) is (да)
+  :t := all[i];
+  if (t проходит фильтры\n(query, status, project)?) then (да)
+    :result += t;
+  else (нет)
+  endif
+  :i := i + 1;
+endwhile (нет)
 
-if (f.statusFilter задан?) then (да)
-  :result := отфильтровать по\nstatus == f.statusFilter;
-else (нет)
-endif
-
-if (f.projectFilter задан?) then (да)
-  :result := отфильтровать по\nprojectId == f.projectFilter;
-else (нет)
-endif
-
-switch (f.sortBy?)
-case (CREATED)
-  :result := sortByDescending(createdAt);
-case (DEADLINE)
-  :result := sortBy(deadline ?: MAX_VALUE);
-case (STATUS)
-  :result := sortBy(status.ordinal);
-endswitch
-
-:вернуть result\n(emit в StateFlow);
+:отсортировать result\nпо f.sortBy;
+:вернуть result;
 
 stop
 
