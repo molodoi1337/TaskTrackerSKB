@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="404px" preserveAspectRatio="none" style="width:479px;height:404px;" version="1.1" viewBox="0 0 479 404" width="479px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="Sans" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="455" x="12" y="26.708">Блок-схема алгоритма TaskRepository.save(task)</text><text fill="#000000" font-family="Sans" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="450" x="14.5" y="47.6611">(сохранение задачи: вставка или обновление)</text><ellipse cx="246" cy="61.9063" fill="#000000" rx="10" ry="10" style="stroke: none; stroke-width: 1.0;"/><rect fill="#EAF4FF" height="33.9688" rx="12.5" ry="12.5" style="stroke: #2A6FBF; stroke-width: 1.5;" width="86" x="203" y="91.9063"/><text fill="#000000" font-family="Sans" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="66" x="213" y="113.0449">Вход: task</text><polygon fill="#FFF3D6" points="207.5,145.875,284.5,145.875,296.5,157.875,284.5,169.875,207.5,169.875,195.5,157.875,207.5,145.875" style="stroke: #B07A00; stroke-width: 1.5;"/><text fill="#000000" font-family="Sans" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="77" x="207.5" y="161.6831">task.id == 0?</text><text fill="#000000" font-family="Sans" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="15" x="180.5" y="155.2808">да</text><text fill="#000000" font-family="Sans" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="21" x="296.5" y="155.2808">нет</text><rect fill="#EAF4FF" height="33.9688" rx="12.5" ry="12.5" style="stroke: #2A6FBF; stroke-width: 1.5;" width="154" x="88" y="179.875"/><text fill="#000000" font-family="Sans" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="134" x="98" y="201.0137">id := dao.insert(task)</text><rect fill="#EAF4FF" height="33.9688" rx="12.5" ry="12.5" style="stroke: #2A6FBF; stroke-width: 1.5;" width="130" x="262" y="179.875"/><text fill="#000000" font-family="Sans" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="110" x="272" y="201.0137">dao.update(task)</text><rect fill="#EAF4FF" height="33.9688" rx="12.5" ry="12.5" style="stroke: #2A6FBF; stroke-width: 1.5;" width="95" x="279.5" y="233.8438"/><text fill="#000000" font-family="Sans" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="75" x="289.5" y="254.9824">id := task.id</text><polygon fill="#FFF3D6" points="246,273.8125,258,285.8125,246,297.8125,234,285.8125,246,273.8125" style="stroke: #B07A00; stroke-width: 1.5;"/><rect fill="#EAF4FF" height="33.9688" rx="12.5" ry="12.5" style="stroke: #2A6FBF; stroke-width: 1.5;" width="88" x="202" y="317.8125"/><text fill="#000000" font-family="Sans" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="68" x="212" y="338.9512">вернуть id</text><ellipse cx="246" cy="382.7813" fill="#FFFFFF" rx="11" ry="11" style="stroke: #000000; stroke-width: 1.0;"/><ellipse cx="246" cy="382.7813" fill="#000000" rx="6" ry="6" style="stroke: #7F7F7F; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="246" x2="246" y1="71.9063" y2="91.9063"/><polygon fill="#333333" points="242,81.9063,246,91.9063,250,81.9063,246,85.9063" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="327" x2="327" y1="213.8438" y2="233.8438"/><polygon fill="#333333" points="323,223.8438,327,233.8438,331,223.8438,327,227.8438" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="195.5" x2="165" y1="157.875" y2="157.875"/><line style="stroke: #333333; stroke-width: 1.5;" x1="165" x2="165" y1="157.875" y2="179.875"/><polygon fill="#333333" points="161,169.875,165,179.875,169,169.875,165,173.875" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="296.5" x2="327" y1="157.875" y2="157.875"/><line style="stroke: #333333; stroke-width: 1.5;" x1="327" x2="327" y1="157.875" y2="179.875"/><polygon fill="#333333" points="323,169.875,327,179.875,331,169.875,327,173.875" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="165" x2="165" y1="213.8438" y2="285.8125"/><line style="stroke: #333333; stroke-width: 1.5;" x1="165" x2="234" y1="285.8125" y2="285.8125"/><polygon fill="#333333" points="224,281.8125,234,285.8125,224,289.8125,228,285.8125" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="327" x2="327" y1="267.8125" y2="285.8125"/><line style="stroke: #333333; stroke-width: 1.5;" x1="327" x2="258" y1="285.8125" y2="285.8125"/><polygon fill="#333333" points="268,281.8125,258,285.8125,268,289.8125,264,285.8125" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="246" x2="246" y1="125.875" y2="145.875"/><polygon fill="#333333" points="242,135.875,246,145.875,250,135.875,246,139.875" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="246" x2="246" y1="297.8125" y2="317.8125"/><polygon fill="#333333" points="242,307.8125,246,317.8125,250,307.8125,246,311.8125" style="stroke: #333333; stroke-width: 1.0;"/><line style="stroke: #333333; stroke-width: 1.5;" x1="246" x2="246" y1="351.7813" y2="371.7813"/><polygon fill="#333333" points="242,361.7813,246,371.7813,250,361.7813,246,365.7813" style="stroke: #333333; stroke-width: 1.0;"/><!--MD5=[6b4150caebfdda159ed57f7c4eca1ed8]
+@startuml Flowchart_TaskSave
+title Блок-схема алгоритма TaskRepository.save(task)\n(сохранение задачи: вставка или обновление)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF4FF
+skinparam ActivityBorderColor #2A6FBF
+skinparam ActivityDiamondBackgroundColor #FFF3D6
+skinparam ActivityDiamondBorderColor #B07A00
+skinparam ArrowColor #333333
+skinparam defaultFontName Sans
+
+start
+
+:Вход: task;
+
+if (task.id == 0?) then (да)
+  :id := dao.insert(task);
+else (нет)
+  :dao.update(task);
+  :id := task.id;
+endif
+
+:вернуть id;
+
+stop
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 10:22:07 UTC 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 21.0.10+7-Ubuntu-124.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

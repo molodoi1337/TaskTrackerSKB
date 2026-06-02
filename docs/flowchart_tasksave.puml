@@ -1,0 +1,28 @@
+@startuml Flowchart_TaskSave
+title Блок-схема алгоритма TaskRepository.save(task)\n(сохранение задачи: вставка или обновление)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF4FF
+skinparam ActivityBorderColor #2A6FBF
+skinparam ActivityDiamondBackgroundColor #FFF3D6
+skinparam ActivityDiamondBorderColor #B07A00
+skinparam ArrowColor #333333
+skinparam defaultFontName Sans
+
+start
+
+:Вход: task;
+
+if (task.id == 0?) then (да)
+  :id := dao.insert(task);
+else (нет)
+  :dao.update(task);
+  :id := task.id;
+endif
+
+:вернуть id;
+
+stop
+
+@enduml
